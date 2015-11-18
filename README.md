@@ -1,2 +1,2 @@
 # RouteDesigner
-An online bouldering route design tool.
+An online bouldering route designing tool.
