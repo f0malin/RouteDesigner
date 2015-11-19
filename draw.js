@@ -27,10 +27,10 @@ function $(id) {
     img.addEventListener("load", imgLoaded, false);
     img.src = "aaa.png";
 
-    $("reset").addEventListener("click", reset);
-    $("zoomin").addEventListener("click", zoomIn);
-    $("zoomout").addEventListener("click", zoomOut);
-    $("clear").addEventListener("click", clear);
+    $("reset").addEventListener("touchend", reset);
+    $("zoomin").addEventListener("touchend", zoomIn);
+    $("zoomout").addEventListener("touchend", zoomOut);
+    $("clear").addEventListener("touchend", clear);
     points.addEventListener("mousedown", mousedown);
     points.addEventListener("mouseup", mouseup);
     points.addEventListener("mousemove", mousemove);
