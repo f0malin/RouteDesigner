@@ -27,10 +27,14 @@ function $(id) {
     img.addEventListener("load", imgLoaded, false);
     img.src = "aaa.png";
 
-    $("reset").addEventListener("click", reset);
+    $("reset").addEventListener("touchend", reset);
     $("zoomin").addEventListener("touchend", zoomIn);
     $("zoomout").addEventListener("touchend", zoomOut);
-    $("clear").addEventListener("click", clear);
+    $("clear").addEventListener("touchend", clear);
+    $("reset").addEventListener("mouseup", reset);
+    $("zoomin").addEventListener("mouseup", zoomIn);
+    $("zoomout").addEventListener("mouseup", zoomOut);
+    $("clear").addEventListener("mouseup", clear);
     points.addEventListener("mousedown", mousedown);
     points.addEventListener("mouseup", mouseup);
     points.addEventListener("mousemove", mousemove);
@@ -39,7 +43,9 @@ function $(id) {
     points.addEventListener("touchend", touchend);
     points.addEventListener("touchmove", touchmove);
     points.addEventListener("touchcancel", mouseout);
-    
+
+    var x, y, scale;
+    var pointData = [];
     var dragging = false;
     var lastX, lastY;
     var startX, startY;
@@ -64,85 +70,81 @@ function $(id) {
         if (!dragging) {
             return;
         }
-        var dx = current_dx + event.clientX - lastX;
-        var dy = current_dy + event.clientY - lastY;
+        x = x + event.clientX - lastX;
+        y = y + event.clientY - lastY;
+        console.log("x y: " + x + " " + y);
+        loop();
+
         lastX = event.clientX;
         lastY = event.clientY;
-        current_dx = dx;
-        current_dy = dy;
-        photo.style.transform = "translate(" + dx + "px," + dy + "px) scale(" + current_scale + ")";
-        points.style.transform = "translate(" + dx + "px," + dy + "px) scale(" + current_scale + ")";
     }
 
-    function calcXY(x, y) {
+    function calcXY(cx, cy) {
         var coord = {};
-        coord.x = (x - current_dx) / current_scale;
-        coord.y = (y - current_dy) / current_scale;
+        coord.x = (cx - x)/scale;
+        coord.y = (cy - y)/scale;
         return coord;
     }
     
     function mouseclick(event) {
-        ctx2.fillStyle="#FF0000";
         var coord = calcXY(event.clientX, event.clientY);
-        ctx2.fillRect(coord.x-10, coord.y-10, 20, 20);
+        pointData.push(coord);
+        loop();
     }
     
     function imgLoaded() {
         console.log("image width and height: " + img.width + " " + img.height);
 
-        //photo.width = img.width;
-        //photo.height = img.height;
-        //points.width = width;
-        //points.height = width;
-        
-        //reset();
         x = 0;
         y = 0;
         scale = 1.0;
-        loop();
+        reset(event);
     }
 
-    var x, y, scale;
+
     function loop() {
         ctx2.fillRect(0, 0, width, height);
-        ctx2.drawImage(img, x, y, img.width, img.height, 0, 0, img.width*scale, img.height*scale);
+        ctx2.drawImage(img, 0, 0, img.width, img.height, x, y, img.width*scale, img.height*scale);
+        ctx2.fillStyle="#FF0000";
+        var i;
+        for (i=0;i<pointData.length;i++) {
+            var point = pointData[i];
+            ctx2.fillRect( (point.x-10)*scale + x, (point.y-10)*scale+y, 20*scale, 20*scale);
+        }
+        ctx2.fillStyle="#000000";
     }
 
-    function zoomIn() {
+    function zoomIn(event) {
+        event.preventDefault();
         scale *= 1.2;
         loop();
-        //current_scale *= 1.2;
-        //photo.style.transform =  "translate(" + current_dx + "px," + current_dy + "px) scale(" + current_scale + "," + current_scale + ")";
-        //points.style.transform =  "translate(" + current_dx + "px," + current_dy + "px) scale(" + current_scale + "," + current_scale + ")";
     }
 
-    function zoomOut() {
+    function zoomOut(event) {
+        event.preventDefault();
         scale *= 0.833333;
         loop();
-        /*current_scale *= 0.83333;
-        photo.style.transform =  "translate(" + current_dx + "px," + current_dy + "px) scale(" + current_scale + "," + current_scale + ")";
-        points.style.transform =  "translate(" + current_dx + "px," + current_dy + "px) scale(" + current_scale + "," + current_scale + ")";*/
     }
 
-    function reset() {
+    function reset(event) {
+        event.preventDefault();
+        x = 0;
+        y = 0;
         var xscale = width / img.width;
         var yscale = height / img.height;
-        var scale;
         if (xscale < yscale) {
             scale = xscale;
         } else {
             scale = yscale;
         }
         console.log("scale: " + scale);
-        current_scale = scale;
-        current_dx = 0;
-        current_dy = 0;
-        photo.style.transform = "scale(" + scale + "," + scale + ")";
-        points.style.transform = "scale(" + scale + "," + scale + ")";
+        loop();
     }
 
-    function clear() {
-        ctx2.clearRect(0, 0, img.width, img.height);
+    function clear(event) {
+        event.preventDefault();
+        pointData = [];
+        loop();
     }
 
     function touchstart(event) {
