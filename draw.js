@@ -35,6 +35,10 @@ function $(id) {
     points.addEventListener("mouseup", mouseup);
     points.addEventListener("mousemove", mousemove);
     points.addEventListener("mouseout", mouseout);
+    points.addEventListener("touchstart", touchstart);
+    points.addEventListener("touchend", touchend);
+    points.addEventListener("touchmove", touchmove);
+    points.addEventListener("touchcancel", mouseout);
     
     var dragging = false;
     var lastX, lastY;
@@ -66,7 +70,6 @@ function $(id) {
         lastY = event.clientY;
         current_dx = dx;
         current_dy = dy;
-        console.log("x, y, dx, dy: " + event.clientX + " " + event.clientY + " " + dx + " " + dy);
         photo.style.transform = "translate(" + dx + "px," + dy + "px) scale(" + current_scale + ")";
         points.style.transform = "translate(" + dx + "px," + dy + "px) scale(" + current_scale + ")";
     }
@@ -98,14 +101,12 @@ function $(id) {
 
     function zoomIn() {
         current_scale *= 1.2;
-        console.log("scale: " + current_scale);
         photo.style.transform =  "translate(" + current_dx + "px," + current_dy + "px) scale(" + current_scale + "," + current_scale + ")";
         points.style.transform =  "translate(" + current_dx + "px," + current_dy + "px) scale(" + current_scale + "," + current_scale + ")";
     }
 
     function zoomOut() {
         current_scale *= 0.83333;
-        console.log("scale: " + current_scale);
         photo.style.transform =  "translate(" + current_dx + "px," + current_dy + "px) scale(" + current_scale + "," + current_scale + ")";
         points.style.transform =  "translate(" + current_dx + "px," + current_dy + "px) scale(" + current_scale + "," + current_scale + ")";
     }
@@ -129,5 +130,29 @@ function $(id) {
 
     function clear() {
         ctx2.clearRect(0, 0, img.width, img.height);
+    }
+
+    function touchstart(event) {
+        if (event.targetTouches.length == 1) {
+            event.preventDefault(); // 阻止浏览器默认事件，重要
+            var touch = event.targetTouches[0];
+            mousedown(touch);
+        }
+    }
+
+    function touchend(event) {
+        if (event.changedTouches.length == 1) {
+            event.preventDefault(); // 阻止浏览器默认事件，重要
+            var touch = event.changedTouches[0];
+            mouseup(touch);
+        }
+    }
+
+    function touchmove(event) {
+        if (event.targetTouches.length == 1) {
+            event.preventDefault(); // 阻止浏览器默认事件，重要
+            var touch = event.targetTouches[0];
+            mousemove(touch);
+        }
     }
 })();
