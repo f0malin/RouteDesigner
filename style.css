@@ -32,7 +32,6 @@ body {
     position: absolute;
     transform-origin: left top;
     background-color: blue;
-    opacity: 0.5;
     z-index: 3;
 }
 

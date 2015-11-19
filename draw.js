@@ -28,8 +28,8 @@ function $(id) {
     img.src = "aaa.png";
 
     $("reset").addEventListener("click", reset);
-    $("zoomin").addEventListener("click", zoomIn);
-    $("zoomout").addEventListener("click", zoomOut);
+    $("zoomin").addEventListener("touchend", zoomIn);
+    $("zoomout").addEventListener("touchend", zoomOut);
     $("clear").addEventListener("click", clear);
     points.addEventListener("mousedown", mousedown);
     points.addEventListener("mouseup", mouseup);
@@ -90,25 +90,38 @@ function $(id) {
     function imgLoaded() {
         console.log("image width and height: " + img.width + " " + img.height);
 
-        photo.width = img.width;
-        photo.height = img.height;
-        points.width = img.width;
-        points.height = img.height;
+        //photo.width = img.width;
+        //photo.height = img.height;
+        //points.width = width;
+        //points.height = width;
         
-        ctx.drawImage(img, 0, 0);
-        reset();
+        //reset();
+        x = 0;
+        y = 0;
+        scale = 1.0;
+        loop();
+    }
+
+    var x, y, scale;
+    function loop() {
+        ctx2.fillRect(0, 0, width, height);
+        ctx2.drawImage(img, x, y, img.width, img.height, 0, 0, img.width*scale, img.height*scale);
     }
 
     function zoomIn() {
-        current_scale *= 1.2;
-        photo.style.transform =  "translate(" + current_dx + "px," + current_dy + "px) scale(" + current_scale + "," + current_scale + ")";
-        points.style.transform =  "translate(" + current_dx + "px," + current_dy + "px) scale(" + current_scale + "," + current_scale + ")";
+        scale *= 1.2;
+        loop();
+        //current_scale *= 1.2;
+        //photo.style.transform =  "translate(" + current_dx + "px," + current_dy + "px) scale(" + current_scale + "," + current_scale + ")";
+        //points.style.transform =  "translate(" + current_dx + "px," + current_dy + "px) scale(" + current_scale + "," + current_scale + ")";
     }
 
     function zoomOut() {
-        current_scale *= 0.83333;
+        scale *= 0.833333;
+        loop();
+        /*current_scale *= 0.83333;
         photo.style.transform =  "translate(" + current_dx + "px," + current_dy + "px) scale(" + current_scale + "," + current_scale + ")";
-        points.style.transform =  "translate(" + current_dx + "px," + current_dy + "px) scale(" + current_scale + "," + current_scale + ")";
+        points.style.transform =  "translate(" + current_dx + "px," + current_dy + "px) scale(" + current_scale + "," + current_scale + ")";*/
     }
 
     function reset() {
